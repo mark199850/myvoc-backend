@@ -1,0 +1,6 @@
+@myvoc_webapi_HostAddress = http://localhost:5052
+
+GET {{myvoc_webapi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
