@@ -1,21 +1,13 @@
-using myvoc_webapi.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-builder.Services.AddTransient<LinguaRobotNormalizer>();
-builder.Services.AddHttpClient("word", httpClient =>
-{
-    httpClient.BaseAddress = new Uri("https://lingua-robot.p.rapidapi.com/");
-    httpClient.Timeout = TimeSpan.FromSeconds(15);
-    
-    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("x-rapidapi-key", builder.Configuration["HttpClient:APIKey"]);
-    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("x-rapidapi-host", builder.Configuration["HttpClient:Host"]); // builder.Configuration["HttpClient:APIKey"]);
-}).SetHandlerLifetime(TimeSpan.FromSeconds(15));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddDbContext<DictionaryContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DictionaryDatabase")));
+builder.Services.AddScoped<DictionaryService>();
+
 builder.Services.AddOpenApi();
 var app = builder.Build();
 app.UseCors(x => x
@@ -23,7 +15,7 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyOrigin()
 );
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
